@@ -1,0 +1,6 @@
+[package]
+name = "ot_core"
+version = "0.1.0"
+authors = ["etspurlock"]
+
+[dependencies]
