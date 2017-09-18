@@ -1,22 +1,15 @@
 use std::collections::BTreeSet;
 use ot_set::OTSet;
+use operation::Operation;
 
-struct Operation
-{
-    is_insert : bool,
-    chr : char,
-    index : usize,
-    id : usize,
-    user_id : usize
+
+pub struct DocState {
+    pub operations : Vec<Operation>,
+    pub deletions : BTreeSet<usize>,
+    doc_str : String
 }
 
-struct DocState {
-    operations : Vec<Operation>,
-    deletions : BTreeSet<usize>,
-    doc_str : String,
-    points : Vec<usize>
-}
-
+#[allow(dead_code)]
 impl DocState
 {
     fn new(start_string : String) -> DocState
@@ -25,8 +18,7 @@ impl DocState
         { 
             operations : Vec::new(),
             deletions : BTreeSet::new(),
-            doc_str : start_string, 
-            points : Vec::new()
+            doc_str : start_string
         };
         doc
     }
@@ -36,32 +28,17 @@ impl DocState
         if !op.is_insert
         {
             //if the set doesn't already contain the deletion
-            if !self.deletions.contains(&op.index)
+            if !self.deletions.contains(op.get_index())
             {
-                let user_index : usize = self.deletions.get_user_space_index(&op.index);
+                let user_index : usize = self.deletions.get_user_space_index(&op.get_index());
                 //insert the opindex in the deletions Set
-                self.deletions.insert(op.index);
+                self.deletions.insert(op.get_index().clone());
                 self.doc_str.remove(user_index);
-                for i in 0..self.points.len() 
-                {
-                    if self.points[i] > user_index
-                    {
-                        self.points[i] -= 1;
-                    }
-                }
             }
-        }else if op.is_insert
+        }else
         {
-            self.deletions.increment_indices_past_insert(&op.index);
-            let user_index : usize = self.deletions.get_user_space_index(&op.index);
-            self.doc_str.insert(op.index, op.chr);
-            for i in 0..self.points.len() 
-            {
-                if self.points[i] > user_index
-                {
-                    self.points[i] += 1;
-                }
-            }
+            self.deletions.increment_indices_past_insert(&op.get_index());
+            self.doc_str.insert(op.get_index().clone(), op.get_char().clone());
         }
         self.operations.push(op);
     }   
