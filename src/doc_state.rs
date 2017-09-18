@@ -1,12 +1,13 @@
 use std::collections::BTreeSet;
 use ot_set::OTSet;
+
 struct Operation
 {
     is_insert : bool,
     chr : char,
     index : usize,
     id : usize,
-    user : usize
+    user_id : usize
 }
 
 struct DocState {
