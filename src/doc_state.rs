@@ -25,7 +25,7 @@ impl DocState
     
     fn add(&mut self, op : Operation)
     {
-        if !op.is_insert
+        if !op.is_insert()
         {
             //if the set doesn't already contain the deletion
             if !self.deletions.contains(op.get_index())

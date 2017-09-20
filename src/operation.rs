@@ -3,8 +3,7 @@
 */ 
 pub struct Operation
 {
-    //THIS FIELD SHOULD NEVER EVER BE EDITED BUT CLONING A BOOL FOR A CHECK IS STUPID
-    pub is_insert : bool,
+    is_insert : bool,
     chr : char,
     index : usize,
     id : usize,
@@ -64,5 +63,10 @@ impl Operation
     pub fn get_user_id(&self) -> &usize
     {
         return &self.user_id;
+    }
+    
+    pub fn is_insert(&self) -> bool
+    {
+        return self.is_insert;
     }
 }

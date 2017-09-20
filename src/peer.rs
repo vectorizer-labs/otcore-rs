@@ -83,17 +83,17 @@ impl Peer
         let mut s : BTreeSet<usize> = BTreeSet::new();
         let mut t : BTreeSet<usize> = BTreeSet::new();
         
-        //for all the operations that are potentially in conflict 
-        //merge them
+        //Go backwards through the operations 
         for ix in (doc_state.operations.len()-1..self.revision_id).rev()
         {
             let doc_space_index : usize = s.get_doc_space_index(doc_state.operations[ix].get_id());
             //if the operation is an insert
-            if doc_state.operations[ix].is_insert 
+            if doc_state.operations[ix].is_insert()
             {
-                //if our context does not contain this id
+                //if our context does not contain this operation
                 if !self.context.contains(doc_state.operations[self.revision_id].get_id())
                 {
+                    //we need to add it
                     insert_list.push(
                         (
                         t.get_user_space_index(doc_state.operations[ix].get_id()),
