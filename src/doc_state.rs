@@ -4,8 +4,8 @@ use operation::Operation;
 
 
 pub struct DocState {
-    pub operations : Vec<Operation>,
-    pub deletions : BTreeSet<usize>,
+    operations : Vec<Operation>,
+    deletions : BTreeSet<usize>,
     doc_str : String
 }
 
@@ -23,7 +23,7 @@ impl DocState
         doc
     }
     
-    fn add(&mut self, op : Operation)
+    pub fn add(&mut self, op : Operation)
     {
         if !op.is_insert()
         {
@@ -56,6 +56,16 @@ impl DocState
     pub fn xform_ix(&self, index : &usize) -> usize
     {
         return self.deletions.get_doc_space_index(index);
+    }
+    
+    pub fn get_operation(&self, index : usize) -> &Operation
+    {
+        return &self.operations[index];
+    }
+    
+    pub fn get_operations_len(&self) -> usize
+    {
+        return self.operations.len();
     }
 }
     

@@ -24,7 +24,7 @@ impl Operation
         }
     }
     
-    pub fn transform_insertion(self, transform_tuple : ( usize, usize)) -> Operation
+    pub fn transform_insertion(&mut self, transform_tuple : ( usize, usize))
     {
         let index = transform_tuple.0;
         let user = transform_tuple.1;
@@ -32,16 +32,20 @@ impl Operation
         {
             if self.index < index || (self.index == index && self.user_id < user)
             {
-                return self;
+                return;
             }
-            return Operation::new(self.is_insert, self.chr, self.index+1, self.id, self.user_id);
+            self.index+=1;
+            //mutating in place
+            //return Operation::new(self.is_insert, self.chr, self.index+1, self.id, self.user_id);
         }else
         {
             if self.index < index
             {
-                return self;
+                return;
             }
-            return Operation::new(self.is_insert, self.chr,self.index + 1,self.id,self.user_id);
+            self.index +=1;
+            //mutatig in place
+            //return Operation::new(self.is_insert, self.chr,self.index + 1,self.id,self.user_id);
         }
     }
     
