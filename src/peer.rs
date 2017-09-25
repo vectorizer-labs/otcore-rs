@@ -4,7 +4,7 @@ use doc_state::DocState;
 use operation::Operation;
 
 #[allow(dead_code)]
-struct Peer
+pub struct Peer
 {
     revision_id : usize, // a linearly incremented revision id
     context : BTreeSet<usize> //the context of revisions this peer exists in
@@ -13,7 +13,7 @@ struct Peer
 #[allow(dead_code)]
 impl Peer
 {
-    fn new() -> Peer
+    pub fn new() -> Peer
     {
         return Peer
         {
@@ -22,7 +22,7 @@ impl Peer
         }
     }
     
-    fn merge_op(&mut self, mut doc_state : DocState, mut op : Operation)
+    pub fn merge_op(&mut self, mut doc_state : DocState, mut op : Operation)
     {
         
         //we already have this, roll rev forward
