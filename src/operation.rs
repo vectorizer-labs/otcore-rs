@@ -1,13 +1,17 @@
 use std::mem::transmute;
+//use std::time::{Duration, SystemTime};
+
 /*
 *  An Operation is an immutable data type that can be applied to a document 
 */ 
+#[derive(Clone)]
 pub struct Operation
 {
     is_insert : bool,
     chr : char,
     index : usize,
     id : usize,
+    time_stamp : usize,
     user_id : usize
 }
 
@@ -21,6 +25,7 @@ impl Operation
             chr : ch,
             index : ix,
             id : op_id,
+            time_stamp : 0,
             user_id : user
         }
     }
@@ -45,7 +50,7 @@ impl Operation
                 return;
             }
             self.index +=1;
-            //mutatig in place
+            //mutating in place
             //return Operation::new(self.is_insert, self.chr,self.index + 1,self.id,self.user_id);
         }
     }
@@ -65,7 +70,7 @@ impl Operation
     //we reach that many operations
     //this also lets quickly count the number of operations
     //even with the extra boolean (disreagrding fixed block size)
-    pub fn serialize(&self) -> [u8;12]
+    pub fn serialize(&self) -> [u8;16]
     {
         let signed_index : i32 = match self.is_insert
         {
@@ -75,18 +80,20 @@ impl Operation
         
         let character : u32 = self.chr as u32;
         let user_id : u32 = self.user_id as u32;
-        
+        let epoch_time : u32 = self.time_stamp as u32;
         //because we created local variables on the stack 
         //we can rest easy that these unsafe operations won't fail
         //maybe IDK TODO: check that these won't fail :)
         let ix_bytes: [u8; 4] = unsafe { transmute(signed_index.to_be()) };
         let chr_bytes: [u8; 4] = unsafe { transmute(character.to_be()) };
         let uid_bytes: [u8; 4] = unsafe { transmute(user_id.to_be()) };
+        let time_bytes: [u8; 4] = unsafe { transmute(epoch_time.to_be()) };
         
         return [
             ix_bytes[0],ix_bytes[1],ix_bytes[2],ix_bytes[3], //index
             chr_bytes[0],chr_bytes[1],chr_bytes[2],chr_bytes[3], //unicode character
-            uid_bytes[0],uid_bytes[1],uid_bytes[2],uid_bytes[3] //user id
+            uid_bytes[0],uid_bytes[1],uid_bytes[2],uid_bytes[3], //user id
+            time_bytes[0],time_bytes[1],time_bytes[2],time_bytes[3] //time
         ];
     }
     
@@ -113,5 +120,16 @@ impl Operation
     pub fn is_insert(&self) -> bool
     {
         return self.is_insert;
+    }
+    
+    pub fn get_readable_representation(&self) -> String
+    {
+        return format!("ID : '{}' \nINDEX : '{}' \nCHAR : '{}' CHAR_VALUE : '{}' \nUSER_ID : '{}' \nIS_INSERT : {} \n",
+        self.get_id(),
+        self.get_index(),
+        self.get_char(),
+        self.get_char().clone() as u32,    
+        self.get_user_id(),
+        self.is_insert());
     }
 }
