@@ -4,7 +4,7 @@ use std::mem::transmute;
 /*
 *  An Operation is an immutable data type that can be applied to a document 
 */ 
-#[derive(Clone)]
+#[derive(Clone,PartialEq)]
 pub struct Operation
 {
     is_insert : bool,

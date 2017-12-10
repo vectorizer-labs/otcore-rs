@@ -29,7 +29,9 @@ impl OTSet for BTreeSet<usize>
                     {
                         if n == index
                         { 
-                            panic!("The index {} is equal to {}! This shouldn't be able to happen.", index, n) 
+                            //panic!("The index {} is equal to {}! This shouldn't be able to happen.", index, n) 
+                            //this should only occur on the removal of a delete op
+                            //TODO: Further checks to prevent abuse
                         }
                         break; 
                     }

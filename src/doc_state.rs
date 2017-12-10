@@ -12,6 +12,9 @@ pub struct DocState {
 #[allow(dead_code)]
 impl DocState
 {
+    ///
+    ///Creates a new DocState
+    ///
     pub fn new(start_string : String) -> DocState
     {
         let doc : DocState = DocState 
@@ -19,6 +22,17 @@ impl DocState
             operations : Vec::new(),
             deletions : BTreeSet::new(),
             doc_str : doc_str_from_string(start_string)
+        };
+        doc
+    }
+    
+    pub fn new_empty() -> DocState
+    {
+        let doc : DocState = DocState 
+        { 
+            operations : Vec::new(),
+            deletions : BTreeSet::new(),
+            doc_str : Vec::new()
         };
         doc
     }
@@ -45,20 +59,18 @@ impl DocState
     
     pub fn remove(&mut self, op : Operation)
     {
+        assert!(self.operations.contains(&op), "You shouldn't be able to get here unless you try to remove an operation that doesn't exist in the set.");
         if !op.is_insert() //deletion
         {
             //if the set does contain the deletion
             if self.deletions.contains(op.get_index())
             {
-                
                 let user_index : usize = self.deletions.get_user_space_index(&op.get_index());
                 //insert the opindex in the deletions Set
                 self.deletions.remove(op.get_index());
                 self.doc_str.insert(user_index, op.get_char().clone()); //search for the character that was deleted and re-insert it here
-                
             }
             
-            panic!("You shouldn't be able to get here unless you try to remove an operation that doesn't exist in the set.");
         }else //insertion
         {
             let user_index : usize = self.deletions.get_user_space_index(&op.get_index());
@@ -99,9 +111,10 @@ impl DocState
     {
         return self.operations.len();
     }
+
 }
 
-fn doc_str_from_string(start_string : String) -> Vec<char>
+pub fn doc_str_from_string(start_string : String) -> Vec<char>
 {
     let mut final_vec : Vec<char> = Vec::new();
     for ch in start_string.chars()

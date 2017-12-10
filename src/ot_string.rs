@@ -1,4 +1,9 @@
-struct ot_string
+struct OTString
 {
     
+}
+
+impl OTString
+{
+
 }

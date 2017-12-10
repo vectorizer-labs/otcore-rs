@@ -49,6 +49,7 @@ impl Peer
     }
     
     // we already have this, but can't roll rev forward
+    //checks if this is this case
     fn is_existing_but_cannot_roll_forward(&mut self, doc_state : &DocState, op_id : &usize) -> bool
     {
         for i in self.revision_id..doc_state.get_operations_len()
@@ -63,6 +64,7 @@ impl Peer
     }
     
     //we already have this, roll rev forward
+    //checks if this is the case
     fn is_existing_revision(&mut self, doc_state : &DocState, op_id : &usize) -> bool
     {
         if self.revision_id < doc_state.get_operations_len() && doc_state.get_operation(self.revision_id).get_id() == op_id
