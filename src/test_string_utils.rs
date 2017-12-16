@@ -7,7 +7,7 @@ use test;
 use std::char;  
 
 //generates a new random insert operation
-pub fn rand_insert_op(op_ix_range : usize) -> Operation
+pub fn rand_insert_op() -> Operation
 {
     //initialize random
     let mut rng = rand::thread_rng();
@@ -24,11 +24,11 @@ pub fn rand_insert_op(op_ix_range : usize) -> Operation
     let test_op_id = op_val_range.ind_sample(&mut rng) as usize;
     let test_user_id = op_val_range.ind_sample(&mut rng) as usize;
 
-    Operation::new(true, test_char, test_ix, test_op_id, test_user_id)
+    Operation::new(true, test_char, test_ix, test_op_id, test_user_id,0)
 }
 
 //generates a new random insert operation
-pub fn rand_remove_op(op_ix_range : usize) -> Operation
+pub fn rand_remove_op() -> Operation
 {
     //initialize random
     let mut rng = rand::thread_rng();
@@ -43,7 +43,7 @@ pub fn rand_remove_op(op_ix_range : usize) -> Operation
     let test_op_id = op_val_range.ind_sample(&mut rng) as usize;
     let test_user_id = op_val_range.ind_sample(&mut rng) as usize;
 
-    Operation::new(false, test_char, test_ix, test_op_id, test_user_id)
+    Operation::new(false, test_char, test_ix, test_op_id, test_user_id,0)
 }
 
 //Generates a char over the full range of Unicode support (support for the full 32 bits)

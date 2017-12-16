@@ -2,8 +2,8 @@
 #[allow(dead_code)]
 
 extern crate rand;
-use doc_state::DocState;
 use test_string_utils;
+use doc_state::DocState;
 
 pub const TEST_SIZE : usize = 100;
 
@@ -29,7 +29,7 @@ fn doc_state_get_string()
 //tests insertion for doc_state
 fn doc_state_add_insertion()
 {   
-    let test_operation = test_string_utils::rand_insert_op(TEST_SIZE - 1);
+    let test_operation = test_string_utils::rand_insert_op();
     
     //generate the first half of the doc
     let first_half = test_string_utils::rand_readable_string(test_operation.get_index().clone() as usize);
@@ -60,7 +60,7 @@ fn doc_state_add_insertion()
 #[test]
 fn doc_state_add_remove()
 {
-    let test_operation = test_string_utils::rand_remove_op(TEST_SIZE - 1);
+    let test_operation = test_string_utils::rand_remove_op();
     //println!("{} \n\n\n\n\n\n",test_operation.get_readable_representation());
     
     //generate the first half of the doc
@@ -91,7 +91,7 @@ fn doc_state_add_remove()
 #[test]
 fn remove_insertion_operation()
 {
-    let test_operation = test_string_utils::rand_insert_op(TEST_SIZE - 1);
+    let test_operation = test_string_utils::rand_insert_op();
     
     //generate an arbitrary test string
     let test_string = test_string_utils::rand_readable_string(test_operation.get_index().clone() as usize);
@@ -111,7 +111,7 @@ fn remove_insertion_operation()
 #[test]
 fn remove_remove_operation()
 {
-    let test_operation = test_string_utils::rand_remove_op(TEST_SIZE - 1);
+    let test_operation = test_string_utils::rand_remove_op();
     println!("{} \n\n",test_operation.get_readable_representation());
     
     //generate the first half of the doc

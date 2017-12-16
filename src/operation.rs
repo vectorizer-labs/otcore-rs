@@ -1,33 +1,61 @@
-use std::mem::transmute;
-//use std::time::{Duration, SystemTime};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use std::io::Cursor;
+use std::char;
 
 /*
-*  An Operation is an immutable data type that can be applied to a document 
+*  An Operation is an IMMUTABLE! data type that can be applied to a document 
 */ 
 #[derive(Clone,PartialEq)]
 pub struct Operation
 {
-    is_insert : bool,
-    chr : char,
-    index : usize,
-    id : usize,
-    time_stamp : usize,
-    user_id : usize
+    is_insert : bool,//is this operation an insert or a remove?
+    chr : char,// the character the operation applies to
+    index : usize, //the character index where the operation occurs
+    id : usize, // the linear order in which the operation came
+    time_stamp : usize,// the epoch time stamp
+    user_id : usize// the user id
+    //these parameters must remain usize to take advantage of the platforms capabilities
+    //despite the fact they are currently serialized to u32
+    //file formats can change, but memory representation must also remain flexible to allow this
 }
 
 impl Operation
 {
-    pub fn new(ins : bool, ch : char, ix : usize, op_id : usize, user : usize) -> Operation
+    pub fn new(ins : bool, ch : char, ix : usize, op_id : usize, user : usize, time : usize) -> Operation
     {
         Operation
-        { 
+        {
             is_insert : ins,  
             chr : ch,
             index : ix,
             id : op_id,
-            time_stamp : 0,
+            time_stamp : time,
             user_id : user
         }
+    }
+    
+    
+    pub fn deserialize(op : Vec<u8>) -> Operation
+    {
+        let mut rdr = Cursor::new(op);
+        
+        //TODO : This whole block desperately needs error checking!!!
+        let signed_index : isize = rdr.read_i32::<LittleEndian>().unwrap() as isize;
+        let character : char = char::from_u32(rdr.read_u32::<LittleEndian>().unwrap()).unwrap();
+        let user : usize = rdr.read_u32::<LittleEndian>().unwrap() as usize;
+        let time : usize = rdr.read_u32::<LittleEndian>().unwrap() as usize;
+        let op_id : usize = rdr.read_u32::<LittleEndian>().unwrap() as usize;
+        
+        return Operation
+        {
+            is_insert : signed_index.is_positive(),
+            chr : character,
+            index : signed_index.abs() as usize,
+            id : op_id,
+            time_stamp : time,
+            user_id : user
+        }
+        
     }
     
     pub fn transform_insertion(&mut self, transform_tuple : ( usize, usize))
@@ -42,7 +70,7 @@ impl Operation
             }
             self.index+=1;
             //mutating in place
-            //return Operation::new(self.is_insert, self.chr, self.index+1, self.id, self.user_id);
+            //return Operation::new(self.is_insert, self.chr, self.index+1, self.id, self.user_id,0);
         }else
         {
             if self.index < index
@@ -51,16 +79,18 @@ impl Operation
             }
             self.index +=1;
             //mutating in place
-            //return Operation::new(self.is_insert, self.chr,self.index + 1,self.id,self.user_id);
+            //return Operation::new(self.is_insert, self.chr,self.index + 1,self.id,self.user_id,0);
         }
     }
     
-    //Serializes an OT operation to a 12 byte format
+    //Serializes an OT operation to a 20 byte format
     //4 bytes - index represented as a signed integer
     //          signed to represent is_insert 
     //          + means insert; - means delete
     //4 bytes - represents the unicode char
     //4 bytes - the user id the op belongs to
+    //4 bytes - epoch timestamp
+    //4 bytes - operation ID
     //
     //if the index gets over the cap of 2^31 
     //god save our souls + we can just add an extra boolean
@@ -70,31 +100,32 @@ impl Operation
     //we reach that many operations
     //this also lets quickly count the number of operations
     //even with the extra boolean (disreagrding fixed block size)
-    pub fn serialize(&self) -> [u8;16]
+    pub fn serialize(&self) -> Vec<u8>
     {
         let signed_index : i32 = match self.is_insert
         {
-            true => self.index as i32,
-            false => -(self.index as i32)
+            true => self.index.clone() as i32,
+            false => -(self.index.clone() as i32)
         };
         
-        let character : u32 = self.chr as u32;
-        let user_id : u32 = self.user_id as u32;
-        let epoch_time : u32 = self.time_stamp as u32;
-        //because we created local variables on the stack 
-        //we can rest easy that these unsafe operations won't fail
-        //maybe IDK TODO: check that these won't fail :)
-        let ix_bytes: [u8; 4] = unsafe { transmute(signed_index.to_be()) };
-        let chr_bytes: [u8; 4] = unsafe { transmute(character.to_be()) };
-        let uid_bytes: [u8; 4] = unsafe { transmute(user_id.to_be()) };
-        let time_bytes: [u8; 4] = unsafe { transmute(epoch_time.to_be()) };
+        let mut wtr = vec![];
         
-        return [
-            ix_bytes[0],ix_bytes[1],ix_bytes[2],ix_bytes[3], //index
-            chr_bytes[0],chr_bytes[1],chr_bytes[2],chr_bytes[3], //unicode character
-            uid_bytes[0],uid_bytes[1],uid_bytes[2],uid_bytes[3], //user id
-            time_bytes[0],time_bytes[1],time_bytes[2],time_bytes[3] //time
-        ];
+        //write index + is_insert
+        wtr.write_i32::<LittleEndian>(signed_index).unwrap();
+        
+        //write char
+        wtr.write_u32::<LittleEndian>(self.chr.clone() as u32).unwrap();
+        
+        //write user id
+        wtr.write_u32::<LittleEndian>(self.user_id.clone() as u32).unwrap();
+        
+        //write time
+        wtr.write_u32::<LittleEndian>(self.time_stamp.clone() as u32).unwrap();
+        
+        //write op id
+        wtr.write_u32::<LittleEndian>(self.id.clone() as u32).unwrap();
+        
+        return wtr;
     }
     
     pub fn get_id(&self) -> &usize
