@@ -22,7 +22,7 @@ impl Peer
         }
     }
     
-    pub fn merge_op(&mut self, mut doc_state : DocState, mut op : Operation)
+    pub fn merge_op(&mut self,doc_state : &mut DocState, mut op : Operation)
     {
         
         //we already have this, roll rev forward
