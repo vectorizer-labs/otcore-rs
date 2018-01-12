@@ -1,9 +1,0 @@
-struct OTString
-{
-    
-}
-
-impl OTString
-{
-
-}

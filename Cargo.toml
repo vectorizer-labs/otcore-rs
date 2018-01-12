@@ -4,5 +4,4 @@ version = "0.1.0"
 authors = ["etspurlock"]
 
 [dependencies]
-rand = "*"
-byteorder = "*"
+
