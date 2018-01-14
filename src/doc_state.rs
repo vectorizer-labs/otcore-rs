@@ -75,14 +75,14 @@ impl<T: Clone> DocState <T>
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///BEGIN PEER MERGE OPERATIONS
     
-    pub fn merge_op(&mut self, peer : &mut Peer, mut op : Operation<T>)
+    pub fn merge_op(&mut self, peer : &mut Peer, mut op : Operation<T>) -> Option<Operation<T>>
     {
         
         //we already have this, roll rev forward
-        if self.is_existing_revision(peer, op.id()) { return; }
+        if self.is_existing_revision(peer, op.id()) { return None; }
             
         // we already have this, but can't roll rev forward
-        if self.is_existing_but_cannot_roll_forward(peer, op.id()) { return; }
+        if self.is_existing_but_cannot_roll_forward(peer, op.id()) { return None; }
         
         // we don't have it, need to merge
         //instead of returning a new op we just modify op in place
@@ -101,7 +101,9 @@ impl<T: Clone> DocState <T>
         }
         
         //add the newly transformed operation to self
-        self.add(op);
+        self.add(op.clone());
+        
+        return Some(op);
     }
     
     // we already have this, but can't roll rev forward
@@ -175,19 +177,17 @@ impl<T: Clone> DocState <T>
         }
     }
     
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///GETTERS BEGIN
-    /*
-    pub fn get_string(&self) -> String
+    
+    //GETTERS BEGIN
+    pub fn operations(&self)-> &Vec<Operation<T>>
     {
-        let mut s: String = String::new();
-        for ch in self.doc_str.clone()
-        {
-            s.push(ch);
-        }
-        
-        return s;
-    }*/
+        return &self.operations;
+    }
+    
+    pub fn doc_str(&self) -> &Vec<T>
+    {
+        return &self.doc_str;
+    }
     
     pub fn xform_ix(&self, index : &usize) -> usize
     {
