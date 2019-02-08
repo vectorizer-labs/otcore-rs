@@ -1,13 +1,13 @@
-use std::collections::BTreeSet;
+use std::collections::BTreeSet;       
 use ot_set::OTSet;
 use operation::Operation;
 use peer::Peer;
 
 
 pub struct DocState<T : Clone> {
-    operations : Vec<Operation<T>>,
-    deletions : BTreeSet<usize>,
-    doc_str : Vec<T>
+    pub operations : Vec<Operation<T>>,
+    pub deletions : BTreeSet<usize>,
+    pub doc_str : Vec<T>
 }
 
 #[allow(dead_code)]
@@ -17,7 +17,7 @@ impl<T: Clone> DocState <T>
     pub fn new() -> DocState<T>
     {
         let doc : DocState<T> = DocState 
-        { 
+        {
             operations : Vec::new(),
             deletions : BTreeSet::new(),
             doc_str : Vec::new()
@@ -25,14 +25,18 @@ impl<T: Clone> DocState <T>
         doc
     }
     
+    
+    
     pub fn add(&mut self, op : Operation<T>)
     {
+        //if its an insert operation
         if !op.is_insert()
         {
             //if the set doesn't already contain the deletion
             if !self.deletions.contains(op.get_index())
             {
                 let user_index : usize = self.deletions.get_user_space_index(&op.get_index());
+                
                 //insert the opindex in the deletions Set
                 self.deletions.insert(op.get_index().clone());
                 self.doc_str.remove(user_index);

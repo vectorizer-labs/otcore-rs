@@ -4,12 +4,12 @@
 #[derive(Clone,PartialEq)]
 pub struct Operation<T: Clone>
 {
-    is_insert : bool,//is this operation an insert or a remove?
-    object : T,// the object the operation applies to
-    index : usize, //the list index where the operation occurs
-    id : usize, // the linear order in which the operation came
-    time_stamp : usize,// the epoch time stamp
-    user_id : usize// the user id
+    pub is_insert : bool,//is this operation an insert or a remove?
+    pub object : T,// the object the operation applies to
+    pub index : usize, //the list index where the operation occurs
+    pub id : usize, // the linear order in which the operation came
+    pub time_stamp : usize,// the epoch time stamp
+    pub user_id : usize// the user id
     //these parameters must remain usize to take advantage of the platforms capabilities
     //despite the fact they are currently serialized to u32
     //file formats can change, but memory representation must also remain flexible to allow this

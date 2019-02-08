@@ -1,7 +1,7 @@
 [package]
 name = "ot_core"
 version = "0.1.0"
-authors = ["etspurlock"]
+authors = ["Ethan Spurlock <ethan@spurlock.io>"]
 
 [dependencies]
-
+serde_json = "*"
