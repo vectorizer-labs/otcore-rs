@@ -1,7 +1,7 @@
 /*
 *  An Operation<T> is an IMMUTABLE! data type that can be applied to a document 
 */ 
-#[derive(Clone,PartialEq)]
+#[derive(Clone)]
 pub struct Operation<T: Clone>
 {
     pub is_insert : bool,//is this operation an insert or a remove?
@@ -29,54 +29,26 @@ impl<T: Clone> Operation<T>
             user_id : user
         }
     }
-    
-    pub fn transform_insertion(&mut self, transform_tuple : ( usize, usize))
+
+    pub fn equals(&self, O : &Operation<T>) -> bool
     {
-        let index = transform_tuple.0;
-        let user = transform_tuple.1;
-        if self.is_insert
-        {
-            if self.index < index || (self.index == index && self.user_id < user)
-            {
-                return;
-            }
-            self.index+=1;
-            //mutating in place
-            //return Operation<T>::new(self.is_insert, self.chr, self.index+1, self.id, self.user_id,0);
-        }else
-        {
-            if self.index < index
-            {
-                return;
-            }
-            self.index +=1;
-            //mutating in place
-            //return Operation<T>::new(self.is_insert, self.chr,self.index + 1,self.id,self.user_id,0);
-        }
+        return self.id == O.id && self.user_id == O.user_id && self.time_stamp == O.time_stamp;
     }
-    
-    pub fn id(&self) -> usize
+
+    //set the index of an operation
+   pub fn set_index(mut self, index : usize) -> Operation<T> { self.index = index; self }
+
+   pub fn transform_ins(&mut self, ix : usize, user_id : usize)
+   {
+    if self.is_insert
     {
-        return self.id.clone();
+      if self.index < ix || (self.index == ix && self.user_id < user_id) { return;}
+      else { self.index+=1; } 
+    } 
+    else // O is a delete
+    { 
+      if self.index < ix { return; }
+      else { self.index +=1; }
     }
-    
-    pub fn get_index(&self) -> &usize
-    {
-        return &self.index;
-    }
-    
-    pub fn get_object(&self) -> T
-    {
-        return self.object.clone();
-    }
-    
-    pub fn get_user_id(&self) -> &usize
-    {
-        return &self.user_id;
-    }
-    
-    pub fn is_insert(&self) -> bool
-    {
-        return self.is_insert;
-    }
+  }
 }
