@@ -57,7 +57,7 @@ impl DocState<char>
     };
   }
 
-  pub fn deleteFromString(&mut self, O: Operation<char>)
+  fn deleteFromString(&mut self, O: Operation<char>)
   {
     //if we already deleted the character in question then 
     //ignore this operation because the effect is the same 

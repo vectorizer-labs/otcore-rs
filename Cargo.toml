@@ -2,3 +2,6 @@
 name = "ot_core"
 version = "0.2.0"
 authors = ["Ethan Spurlock <ethan@spurlock.io>"]
+
+[dependencies]
+rand = "0.7.0"
