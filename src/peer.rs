@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 use operation::Operation;
-use doc_state::DocState;
+use list::List;
 use ot_set::OTSet;
 
 // Copyright 2016 Google Inc. All rights reserved.
@@ -41,7 +41,7 @@ impl Peer
   }
 
   //Handles 3 cases as seen in the GOTO paper
-  pub fn mergeOP<T : Clone>(&mut self, O : Operation<T>, dc : &DocState<T>) -> Operation<T>
+  pub fn mergeOP<T : Clone>(&mut self, O : Operation<T>, dc : &List<T>) -> Operation<T>
   {
     if self.repeatOP(&O, dc)  {return O;}
     else if self.case2(&O, dc) { return O;}
@@ -49,9 +49,9 @@ impl Peer
   }
 
 
-  //we already have this operation in the log of our docstate
+  //we already have this operation in the log of our List
   //but a peer sent us a duplicate
-  fn repeatOP<T : Clone>(&mut self, O : &Operation<T>, dc : &DocState<T>) -> bool
+  fn repeatOP<T : Clone>(&mut self, O : &Operation<T>, dc : &List<T>) -> bool
   {
     //the log is
     if self.revision < dc.log.len() && dc.log[self.revision].equals(&O)
@@ -70,7 +70,7 @@ impl Peer
   }
 
   //
-  fn case2<T : Clone>(&mut self, O : &Operation<T>, dc : &DocState<T>) -> bool
+  fn case2<T : Clone>(&mut self, O : &Operation<T>, dc : &List<T>) -> bool
   {
     
     for ix in self.revision..dc.log.len()
@@ -86,7 +86,7 @@ impl Peer
   }
 
 
-  fn merge<T : Clone>(&mut self, mut O : Operation<T>, dc : &DocState<T>) -> Operation<T>
+  fn merge<T : Clone>(&mut self, mut O : Operation<T>, dc : &List<T>) -> Operation<T>
   {
     // we don't have it, need to merge
 		let mut ins_list: Vec<(usize, usize)> = Vec::new();

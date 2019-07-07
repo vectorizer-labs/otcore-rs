@@ -21,26 +21,38 @@ use operation::Operation;
 //references from the source material by Raph Levien and the GOTO paper:
 //http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.933&rep=rep1&type=pdf
 
-pub struct DocState<T : Clone> {
+pub struct List<T : Clone> {
     pub log : Vec<Operation<T>>,
     pub deletes : BTreeSet<usize>,
-    pub string : String,
-    pub points : Vec<usize>
+    pub list : Vec<T>,
+    //pub points : Vec<usize>
 }
 
 
 
-impl DocState<char>
+impl List<char>
 {
 
-  pub fn new() -> DocState<char>
+  pub fn new() -> List<char>
   {
-        let doc : DocState<char> = DocState 
+        let doc : List<char> = List 
         {
             log : Vec::new(),
             deletes : BTreeSet::new(),
-            string : String::new(),
-            points : Vec::new()
+            list : Vec::new()
+            //points : Vec::new()
+        };
+        doc
+  }
+
+  pub fn with_capacity(capacity : usize) -> List<char>
+  {
+        let doc : List<char> = List 
+        {
+            log : Vec::with_capacity(capacity),
+            deletes : BTreeSet::new(),
+            list : Vec::with_capacity(capacity)
+            //points : Vec::with_capacity(capacity)
         };
         doc
   }
@@ -64,17 +76,17 @@ impl DocState<char>
     if self.deletes.contains(&O.index) { return; }
 
     //otherwise get the log space index
-	  let index : usize = self.deletes.getLogSpaceIndex(O.index);
+	  let index : usize = self.deletes.getStringSpaceIndex(O.index);
 
     //delete it
 	  self.deletes.insert(O.index);
 
     //modify the actual string to reflect the change
-	  self.string.remove(index);
+	  self.list.remove(index);
 
     //update the points in the UI view
     //move back every character after the delete by one
-    for i in 0..self.points.len() { if self.points[i] > index { self.points[i] -= 1;} }
+    //for i in 0..self.points.len() { if self.points[i] > index { self.points[i] -= 1;} }
   }
 
   fn insertIntoString(&mut self, O: Operation<char>)
@@ -87,16 +99,28 @@ impl DocState<char>
     let index : usize = self.deletes.getStringSpaceIndex(O.index);
 
     //modify the actual string to reflect the change
-    self.string.insert(index, O.object);
+    self.list.insert(index, O.object);
 
     //update the points in the UI view
     //move every character after the insert up by one
-    for i in 0..self.points.len() { if self.points[i] > index { self.points[i] += 1;} }
+    //for i in 0..self.points.len() { if self.points[i] > index { self.points[i] += 1;} }
   }
 
   //gets the log space index for this docstate
   //used for creating new insert operations in the GUI
  pub fn getLogSpaceIndex(&mut self, index : usize) -> usize { self.deletes.getLogSpaceIndex(index) }
 
+}
+
+impl List<char>
+{
+  pub fn getString(&self) -> String
+  {
+    let stringCopy : Vec<char> = self.list.clone();
+
+    let s: String = stringCopy.into_iter().collect();
+
+    return s;
+  }
 }
     

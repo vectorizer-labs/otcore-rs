@@ -1,7 +1,8 @@
-//fight me!!!
+//fight me
 #![allow(non_snake_case)]
-pub mod doc_state;
+pub mod list;
 pub mod peer;
 pub mod operation;
 mod ot_set;
+#[cfg(test)]
 mod tests;
