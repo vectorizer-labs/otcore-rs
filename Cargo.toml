@@ -6,8 +6,5 @@ authors = ["Ethan Spurlock <ethan@spurlock.io>"]
 [dependencies]
 rand = "0.7.0"
 
-[profile.dev]
-opt-level = 3
-
-[profile.test]
+[profile.bench]
 opt-level = 3

@@ -1,3 +1,5 @@
+#![feature(test)]
+
 //fight me
 #![allow(non_snake_case)]
 pub mod list;
